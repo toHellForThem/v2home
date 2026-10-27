@@ -1,0 +1,3 @@
+config v2home 'main'
+	option listen '0.0.0.0:8080'
+	option log_level 'info'

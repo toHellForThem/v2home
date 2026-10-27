@@ -1,0 +1,34 @@
+name: v2home
+
+services:
+  backend:
+    image: golang:1.23-alpine
+    working_dir: /src/backend
+    command: sh -c "go mod download && go run ./cmd/v2home --listen 0.0.0.0:8080"
+    environment:
+      V2HOME_LOG_LEVEL: debug
+    volumes:
+      - ./backend:/src/backend
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /src/frontend
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_DEV_API_TARGET: http://backend:8080
+    volumes:
+      - ./frontend:/src/frontend
+      - frontend-node-modules:/src/frontend/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  go-mod-cache:
+  go-build-cache:
+  frontend-node-modules:
